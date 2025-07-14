@@ -9,3 +9,6 @@ __pycache__/
 
 # Ignore my experiments. They just for me =)
 experiments
+
+# Ignore output files
+output/
