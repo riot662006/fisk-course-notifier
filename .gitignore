@@ -1,0 +1,15 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[codz]
+*$py.class
+
+# Environment variables and virtual environments
+.env
+.venv
+
+# Ignore my experiments. They just for me =)
+experiments
+
+# Ignore generated files
+scraper.log
+course_data.json
