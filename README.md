@@ -1,4 +1,4 @@
-# Fisk Course Scraper
+# Fisk Course Web Scraper
 > **✍️ Motivation:** I was often late to register for classes because the current system doesn’t notify students when new course sections open up. To solve this, I built my own notification system that checks for changes and alerts me instantly — making sure I never miss an opportunity again.
 
 This project automates the scraping and monitoring of course section data from Fisk University's Colleague Self-Service portal. It uses Selenium for browser automation, BeautifulSoup for HTML parsing, and Pushbullet for notifications.
