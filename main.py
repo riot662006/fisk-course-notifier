@@ -20,7 +20,7 @@ from bs4 import BeautifulSoup
 from pushbullet import Pushbullet
 
 # Configure Logging
-logging.basicConfig(filename="scraper.log", level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
+logging.basicConfig(filename="output/scraper.log", level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 
 # Thread lock to prevent race conditions
 file_lock = threading.Lock()
@@ -79,7 +79,7 @@ def generate_hash(data):
     data_string = json.dumps(data, sort_keys=True)  # Convert to JSON string format
     return hashlib.sha256(data_string.encode('utf-8')).hexdigest()  # Generate SHA-256 hash
 
-def save_results_to_json(results, filename="course_data.json"):
+def save_results_to_json(results, filename="output/course_data.json"):
     """Safely save scraped results to a JSON file."""
     with file_lock:
         should_update = False

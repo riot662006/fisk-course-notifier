@@ -9,7 +9,3 @@ __pycache__/
 
 # Ignore my experiments. They just for me =)
 experiments
-
-# Ignore generated files
-scraper.log
-course_data.json
