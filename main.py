@@ -39,7 +39,7 @@ def get_course_section_table(course_id):
     """Scrape course section table for a given course ID."""
     logging.info(f"Starting scraping for course: {course_id}")
     
-    driver = create_driver(f"{URL}?keyword={course_id}", headless=False)  # Ensure headless mode is used
+    driver = create_driver(f"{URL}?keyword={course_id}", headless=True)  # Ensure headless mode is used
     
     try:
         WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.ID, "collapsible-1-collapseBody")))
@@ -95,9 +95,7 @@ def save_results_to_json(results, filename="course_data.json"):
                 for key, value in result.items():
                     current_hash = generate_hash(data.get(key, []))
                     new_hash = generate_hash(value)
-                    
-                    print(data.get(key, []), value)
-                    
+
                     if current_hash != new_hash:
                         logging.info(f"New data found for {key}")
                         data[key] = value
