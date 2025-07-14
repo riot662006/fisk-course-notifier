@@ -1,2 +1,13 @@
-# This file updates when the scraper is running. It contains logs of the scraping process, including any errors or important messages.
-# Example log entry:
+# This file is automatically updated while the scraper is running.
+# It logs the scraping process, including timestamps, course activity, and any errors or alerts.
+#
+# Example log sequence:
+# 2025-07-13 22:39:28,065 - INFO - Starting scraping for course: nsci-999
+# 2025-07-13 22:39:33,737 - INFO - Scraping successful for nsci-999, extracted 2 sections.
+# 2025-07-13 22:39:35,890 - INFO - New data found for nsci-999
+# 2025-07-13 22:39:36,050 - INFO - Push sent: {..data}
+# 2025-07-13 22:39:36,050 - INFO - Saving updated data to output/course_data.json
+# 2025-07-13 22:39:36,050 - INFO - Waiting 1 minute before next scrape...
+# 2025-07-13 22:39:45,792 - INFO - Scraper interrupted by user. Exiting gracefully.
+#
+# Tip: Clear this file before each run to avoid mixing old and new logs.
