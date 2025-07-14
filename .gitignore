@@ -11,4 +11,7 @@ __pycache__/
 experiments
 
 # Ignore output files
-output/
+/output/*
+
+# Scratch files
+*.devlog
