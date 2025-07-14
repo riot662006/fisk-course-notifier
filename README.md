@@ -1,16 +1,16 @@
-# Fisk Colleague Course Scraper
-> **Motivation:** I was often late to register for classes because the current system doesn’t notify students when new course sections open up. To solve this, I built my own notification system that checks for changes and alerts me instantly — making sure I never miss an opportunity again.
+# Fisk Course Scraper
+> **✍️ Motivation:** I was often late to register for classes because the current system doesn’t notify students when new course sections open up. To solve this, I built my own notification system that checks for changes and alerts me instantly — making sure I never miss an opportunity again.
 
 This project automates the scraping and monitoring of course section data from Fisk University's Colleague Self-Service portal. It uses Selenium for browser automation, BeautifulSoup for HTML parsing, and Pushbullet for notifications.
 
-## Features
+## 🚀 Features
 
 - Scrapes course section tables for specified courses.
 - Monitors for changes and sends Pushbullet notifications when new data is found.
 - Supports asynchronous scraping for multiple courses.
 - Includes experiments for direct API requests and data extraction.
 
-## Project Structure
+## 📁 Project Structure
 
 - [`main.py`](main.py): Main script for scraping and monitoring courses.
 - [`src/scraper.py`](src/scraper.py): Selenium driver setup and utilities.
@@ -19,7 +19,7 @@ Generated files:
 - [`output/course_data.json`](output/course_data.json): Stores scraped course data.
 - [`output/scraper.log`](output/scraper.log): Logging output.
 
-## Setup
+## ⚙️ Setup
 
 1. **Set up virtual environment:**
     ```sh
@@ -86,9 +86,9 @@ The current scraper uses Selenium-based browser automation to interact with Fisk
 - Add better error handling and retries for flaky selectors.
 - Write tests for the hash check and data comparison logic.
 
-> If you're interested in collaborating or testing early versions of the API-based implementation, feel free to reach out or open an issue!
+> 📌 If you're interested in collaborating or testing early versions of the API-based implementation, feel free to reach out or open an issue!
 
-## License & Disclaimer
+## 📄 License & Disclaimer
 This project is for educational and research purposes only.
 
 Note: This scraper is tailored for Fisk University's Colleague Self-Service portal and may require adaptation for other institutions or portals.
