@@ -88,7 +88,9 @@ The current scraper uses Selenium-based browser automation to interact with Fisk
 
 > 📌 If you're interested in collaborating or testing early versions of the API-based implementation, feel free to reach out or open an issue!
 
-## 📄 License & Disclaimer
-This project is for educational and research purposes only.
+## 📄⚠️ License & Disclaimer
+- This project is intended for **personal and educational** use only.  
+- It is **not** affiliated with or endorsed by Fisk University or Ellucian.  
+- Please **use responsibly** and in accordance with your institution’s policies.
 
 Note: This scraper is tailored for Fisk University's Colleague Self-Service portal and may require adaptation for other institutions or portals.
