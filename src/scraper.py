@@ -4,9 +4,7 @@ from selenium.webdriver.chrome.options import Options
 
 import requests
 import json
-from urllib.parse import urljoin, urlparse, urlencode
-
-from bs4 import BeautifulSoup
+from urllib.parse import urljoin
 
 BASE_URL = "https://fisk-ss.colleague.elluciancloud.com/Student/Courses/"
 
@@ -49,13 +47,14 @@ def fetch_courses(session, search_criteria):
     response = session.post(
         urljoin(BASE_URL, "PostSearchCriteria"),
         headers={
-        'content-type': 'application/json, charset=UTF-8',
-    },
+            'content-type': 'application/json, charset=UTF-8',
+        },
         data=json.dumps(search_criteria)
     )
     throw_bad_response(response)
 
     return response.json()["Courses"]
+
 
 def fetch_sections(session, course_info):
     response = session.post(
@@ -69,6 +68,7 @@ def fetch_sections(session, course_info):
 
     return response.json()["SectionsRetrieved"]["TermsAndSections"]
 
+
 if __name__ == "__main__":
     session = requests.Session()
 
@@ -77,11 +77,10 @@ if __name__ == "__main__":
         {"subject": "ART", "courseNumber": "", "section": "", "synonym": ""}
     ], })
 
-    print(f"Found {len(courses)} courses.")
-    pprint(courses)
-
-    course_info = [{"courseId": course["Id"], "sectionIds": [course["MatchingSectionIds"]], "title": course['Title']} for course in courses]
+    course_info = [{"courseId": course["Id"], "sectionIds": [
+        course["MatchingSectionIds"]], "title": course['Title']} for course in courses]
 
     sections = fetch_sections(session, course_info[0])
-    print(f"Found {len(sections)} sections for course {course_info[0]['courseId']}:")
+    print(
+        f"Found {len(sections)} sections for course {course_info[0]['courseId']}:")
     pprint(sections)
