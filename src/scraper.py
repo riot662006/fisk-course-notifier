@@ -57,6 +57,17 @@ def fetch_courses(session, search_criteria):
 
     return response.json()["Courses"]
 
+def fetch_sections(session, course_info):
+    response = session.post(
+        urljoin(BASE_URL, "Sections"),
+        headers={
+            'content-type': 'application/json, charset=UTF-8',
+        },
+        data=json.dumps(course_info)
+    )
+    throw_bad_response(response)
+
+    return response.json()["SectionsRetrieved"]["TermsAndSections"]
 
 if __name__ == "__main__":
     session = requests.Session()
@@ -68,3 +79,9 @@ if __name__ == "__main__":
 
     print(f"Found {len(courses)} courses.")
     pprint(courses)
+
+    course_info = [{"courseId": course["Id"], "sectionIds": [course["MatchingSectionIds"]], "title": course['Title']} for course in courses]
+
+    sections = fetch_sections(session, course_info[0])
+    print(f"Found {len(sections)} sections for course {course_info[0]['courseId']}:")
+    pprint(sections)
