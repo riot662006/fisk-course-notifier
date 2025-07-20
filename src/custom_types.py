@@ -20,6 +20,6 @@ class CourseData(SectionsSearchCriteria):
 
 class SectionData(TypedDict):
     sectionId: str
-    courseId: int
+    courseId: str
     instructor: str
     availability: SeatAvailability

@@ -50,3 +50,9 @@ class Section:
 
     def __repr__(self):
         return f"<Section {self.id} - {self.name}>"
+
+    def get_subject_code(self) -> str:
+        return self.name.split("-")[0]
+
+    def get_subject_number(self) -> str:
+        return int(self.name.split("-")[1])
