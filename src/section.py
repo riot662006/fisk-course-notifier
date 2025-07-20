@@ -11,10 +11,10 @@ class Section:
         self.name = section_data['SectionNameDisplay']
         self.course_id = section_data['CourseId']
         self.availability = SeatAvailability(
-            availableSeats=section_data['Available'],
-            totalSeats=section_data['Capacity'] if not (
+            availableSeats=int(section_data['Available']),
+            totalSeats=int(section_data['Capacity']) if not (
                 section_data['HasUnlimitedSeats']) else float('inf'),
-            waitlistSeats=section_data['Waitlisted']
+            waitlistSeats=int(section_data['Waitlisted'])
         )
 
         self.instructor = data['FacultyDisplay']
@@ -26,9 +26,9 @@ class Section:
             "courseId": self.course_id,
             "instructor": self.instructor,
             "availability": {
-                "available": self.availability.available,
-                "total": self.availability.total,
-                "waitlist": self.availability.waitlist
+                "available": self.availability["availableSeats"],
+                "total": self.availability["totalSeats"],
+                "waitlist": self.availability["waitlistSeats"]
             }
         }
 
@@ -40,9 +40,9 @@ class Section:
                 "Id": data["id"],
                 "SectionNameDisplay": data["name"],
                 "CourseId": data["courseId"],
-                "Available": data["availability"]["available"],
-                "Capacity": data["availability"]["total"],
-                "Waitlisted": data["availability"]["waitlist"],
+                "Available": str(data["availability"]["available"]),
+                "Capacity": str(data["availability"]["total"]),
+                "Waitlisted": str(data["availability"]["waitlist"]),
                 "HasUnlimitedSeats": data["availability"]["total"] == float("inf")
             },
             "FacultyDisplay": data["instructor"]
