@@ -61,10 +61,7 @@ def fetch_courses(session, search_criteria):
 
     return [
         Course(
-            courseId=course["Id"],
-            sectionIds=course["MatchingSectionIds"],
-            title=course["Title"],
-            subjectCode=course["SubjectCode"]
+            course
         )
         for course in courses
     ]
@@ -97,7 +94,10 @@ if __name__ == "__main__":
         {"subject": "CSCI", "courseNumber": "", "section": "", "synonym": ""},
         {"subject": "ART", "courseNumber": "", "section": "", "synonym": ""}
     ], })
+    print(f"Found {len(courses)} courses:")
+    pprint(courses)
 
     sections = fetch_sections(
         session, courses[0].get_sections_search_criteria())
+    print(f"\n{courses[0].title} sections:")
     pprint(sections)
