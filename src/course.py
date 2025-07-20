@@ -1,10 +1,11 @@
+from typing import Any
 from custom_types import CourseData, SectionsSearchCriteria
 
 
 class Course:
     '''Represents a course with its details and methods to interact with course data. Feel free to add data as needed.'''
 
-    def __init__(self, data):
+    def __init__(self, data: dict[str, Any]):
         self.id = data["Id"]
         self.section_ids = data["MatchingSectionIds"]
         self.title = data["Title"]

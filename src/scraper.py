@@ -1,6 +1,5 @@
 from pprint import pprint
-from selenium import webdriver
-from selenium.webdriver.chrome.options import Options
+from typing import Any
 
 import requests
 import json
@@ -18,7 +17,7 @@ def throw_bad_response(response: requests.Response):
     return response
 
 
-def fetch_courses(session, search_criteria):
+def fetch_courses(session: requests.Session, search_criteria: dict[str, Any]):
     response = session.post(
         urljoin(BASE_URL, "PostSearchCriteria"),
         headers={

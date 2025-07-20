@@ -1,10 +1,11 @@
+from typing import Any
 from custom_types import SeatAvailability, SectionData
 
 
 class Section:
     '''Represents a section with its details and methods to interact with section data. Feel free to add data as needed.'''
 
-    def __init__(self, data: dict[str, any]):
+    def __init__(self, data: dict[str, Any]):
         section_data = data['Section']
 
         self.id = section_data['Id']
@@ -13,7 +14,7 @@ class Section:
         self.availability = SeatAvailability(
             availableSeats=int(section_data['Available']),
             totalSeats=int(section_data['Capacity']) if not (
-                section_data['HasUnlimitedSeats']) else float('inf'),
+                section_data['HasUnlimitedSeats']) else 999_999_999,
             waitlistSeats=int(section_data['Waitlisted'])
         )
 
@@ -21,14 +22,14 @@ class Section:
 
     def to_dict(self) -> SectionData:
         return {
-            "id": self.id,
+            "sectionId": self.id,
             "name": self.name,
             "courseId": self.course_id,
             "instructor": self.instructor,
             "availability": {
-                "available": self.availability["availableSeats"],
-                "total": self.availability["totalSeats"],
-                "waitlist": self.availability["waitlistSeats"]
+                "availableSeats": self.availability["availableSeats"],
+                "totalSeats": self.availability["totalSeats"],
+                "waitlistSeats": self.availability["waitlistSeats"]
             }
         }
 
@@ -37,13 +38,13 @@ class Section:
         # Reconstructs the original "Section" structure expected by __init__
         return cls({
             "Section": {
-                "Id": data["id"],
+                "Id": data["sectionId"],
                 "SectionNameDisplay": data["name"],
                 "CourseId": data["courseId"],
-                "Available": str(data["availability"]["available"]),
-                "Capacity": str(data["availability"]["total"]),
-                "Waitlisted": str(data["availability"]["waitlist"]),
-                "HasUnlimitedSeats": data["availability"]["total"] == float("inf")
+                "Available": str(data["availability"]["availableSeats"]),
+                "Capacity": str(data["availability"]["totalSeats"]),
+                "Waitlisted": str(data["availability"]["waitlistSeats"]),
+                "HasUnlimitedSeats": data["availability"]["totalSeats"] == float("inf")
             },
             "FacultyDisplay": data["instructor"]
         })
@@ -54,5 +55,5 @@ class Section:
     def get_subject_code(self) -> str:
         return self.name.split("-")[0]
 
-    def get_subject_number(self) -> str:
+    def get_subject_number(self) -> int:
         return int(self.name.split("-")[1])

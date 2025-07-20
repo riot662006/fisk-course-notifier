@@ -1,3 +1,4 @@
+from typing import Any
 from dotenv import load_dotenv
 import os
 
@@ -13,11 +14,8 @@ from src.base_scraper import create_driver
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
-from selenium.common.exceptions import NoSuchElementException
-from selenium.webdriver.remote.webelement import WebElement
-from bs4 import BeautifulSoup
 
-from pushbullet import Pushbullet
+from pushbullet import Pushbullet # type: ignore
 
 # Configure Logging
 logging.basicConfig(filename="output/scraper.log", level=logging.INFO,
@@ -37,7 +35,7 @@ PUSH_BULLET_API_KEY = os.getenv("PUSH_BULLET_API_KEY")
 pb = Pushbullet(PUSH_BULLET_API_KEY)
 
 
-def get_course_section_table(course_id):
+def get_course_section_table(course_id: str):
     """Scrape course section table for a given course ID."""
     logging.info(f"Starting scraping for course: {course_id}")
 
@@ -48,16 +46,16 @@ def get_course_section_table(course_id):
         WebDriverWait(driver, 10).until(EC.presence_of_element_located(
             (By.ID, "collapsible-1-collapseBody")))
         courses_HTML = driver.find_element(
-            By.ID, "course-results").find_elements(By.CLASS_NAME, "esg-section--margin-top")
+            By.ID, "course-results").find_elements(By.CLASS_NAME, "esg-section--margin-top") # type: ignore
 
         if not courses_HTML:
             logging.warning(f"No courses found for {course_id}")
             return None
 
         course_HTML = courses_HTML[0]
-        collapsible = course_HTML.find_element(
+        collapsible = course_HTML.find_element( # type: ignore
             By.TAG_NAME, "collapsible-group")
-        collapsible_btn = collapsible.find_element(
+        collapsible_btn = collapsible.find_element( # type: ignore
             By.CLASS_NAME, "esg-collapsible-group__toggle")
         collapsible_btn.click()
 
@@ -66,11 +64,11 @@ def get_course_section_table(course_id):
                 (By.XPATH, "//div[@data-bind='foreach: TermsAndSections']//div"))
         )
 
-        tables_HTML = collapsible.find_element(By.XPATH, "//div[@data-bind='foreach: TermsAndSections']").find_element(
+        tables_HTML = collapsible.find_element(By.XPATH, "//div[@data-bind='foreach: TermsAndSections']").find_element( # type: ignore
             By.XPATH, "//h4[contains(text(), 'Fall 2025')]"
         ).find_element(By.XPATH, "./following-sibling::ul").find_elements(By.TAG_NAME, "table")
 
-        table_data = [[cell.text.strip() for cell in table.find_elements(
+        table_data = [[cell.text.strip() for cell in table.find_elements( # type: ignore
             By.TAG_NAME, "tr")[1].find_elements(By.TAG_NAME, "td")] for table in tables_HTML]
 
         logging.info(
@@ -85,7 +83,7 @@ def get_course_section_table(course_id):
         driver.quit()
 
 
-def generate_hash(data):
+def generate_hash(data: dict[str, Any]) -> str:
     """Generate a hash value for a given data structure."""
     data_string = json.dumps(
         data, sort_keys=True)  # Convert to JSON string format
@@ -93,7 +91,7 @@ def generate_hash(data):
     return hashlib.sha256(data_string.encode('utf-8')).hexdigest()
 
 
-def save_results_to_json(results, filename="output/course_data.json"):
+def save_results_to_json(results: list[dict[str, list[list[str]]] | None], filename: str="output/course_data.json"):
     """Safely save scraped results to a JSON file."""
     with file_lock:
         should_update = False
@@ -107,8 +105,8 @@ def save_results_to_json(results, filename="output/course_data.json"):
         for result in results:
             if result:
                 for key, value in result.items():
-                    current_hash = generate_hash(data.get(key, []))
-                    new_hash = generate_hash(value)
+                    current_hash = generate_hash(data.get(key, [])) # type: ignore
+                    new_hash = generate_hash(value) # type: ignore
 
                     if current_hash != new_hash:
                         logging.info(f"New data found for {key}")
@@ -116,7 +114,7 @@ def save_results_to_json(results, filename="output/course_data.json"):
                         should_update = True
 
         if (should_update):
-            push = pb.push_note("COLLEAGUE SCRAPER",
+            push = pb.push_note("COLLEAGUE SCRAPER", # type: ignore
                                 "New content!!! Check logs for details!!!")
             logging.info(f"Push sent: {push}")
             logging.info(f"Saving updated data to {filename}")

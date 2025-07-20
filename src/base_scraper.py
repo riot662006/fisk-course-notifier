@@ -2,7 +2,7 @@ from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 
 
-def create_driver(url, cookies={}, headless=False):
+def create_driver(url: str, cookies: dict[str, str] = {}, headless: bool = False):
     # Initialize the Selenium WebDriver with necessary options
     options = Options()
 
@@ -23,7 +23,7 @@ def create_driver(url, cookies={}, headless=False):
 
     # Set the cookies from the `requests` response
     for cookie_name, cookie_value in cookies.items():
-        driver.add_cookie({'name': cookie_name, 'value': cookie_value})
+        driver.add_cookie({'name': cookie_name, 'value': cookie_value}) # type: ignore
 
     # After setting the cookies, refresh the page in Selenium to apply them
     driver.refresh()
