@@ -69,13 +69,13 @@ def fetch_courses(session, search_criteria):
     ]
 
 
-def fetch_sections(session: requests.Session, course_info: SectionsSearchCriteria):
+def fetch_sections(session: requests.Session, search_criteria: SectionsSearchCriteria):
     response = session.post(
         urljoin(BASE_URL, "Sections"),
         headers={
             'content-type': 'application/json, charset=UTF-8',
         },
-        data=json.dumps(course_info)
+        data=json.dumps(search_criteria)
     )
     throw_bad_response(response)
 
