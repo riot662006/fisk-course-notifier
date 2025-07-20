@@ -1,5 +1,5 @@
 from typing import Any
-from custom_types import SeatAvailability, SectionData
+from .custom_types import SeatAvailability, SectionData
 
 
 class Section:

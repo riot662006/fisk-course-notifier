@@ -1,13 +1,12 @@
-from pprint import pprint
 from typing import Any
 
 import requests
 import json
 from urllib.parse import urljoin
 
-from course import Course
-from custom_types import SectionsSearchCriteria
-from section import Section
+from .course import Course
+from .custom_types import SectionsSearchCriteria
+from .section import Section
 
 BASE_URL = "https://fisk-ss.colleague.elluciancloud.com/Student/Courses/"
 
@@ -73,12 +72,3 @@ def fetch_sections_by_course_labels(session: requests.Session, course_labels: li
         for section in fetch_sections(session, course.get_sections_search_criteria())
     ]
 
-if __name__ == "__main__":
-    session = requests.Session()
-    sections = fetch_sections_by_course_labels(session, ["ACC-230", "BAD-260"])
-    
-    if len(sections):
-        print("Found sections:")
-        pprint(sections)
-    else:
-        print("No sections found for the given course labels.")

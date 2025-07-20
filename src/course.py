@@ -1,5 +1,5 @@
 from typing import Any
-from custom_types import CourseData, SectionsSearchCriteria
+from .custom_types import CourseData, SectionsSearchCriteria
 
 
 class Course:
@@ -33,6 +33,12 @@ class Course:
             "Number": data["subjectNumber"],
             "SubjectCode": data.get("subjectCode")
         })
+    
+    def get_course_search_criteria(self) -> dict[str, Any]:
+        return {
+            "subjectCode": self.subject_code,
+            "courseNumber": self.subject_number,
+        }
 
     def get_sections_search_criteria(self) -> SectionsSearchCriteria:
         return {
