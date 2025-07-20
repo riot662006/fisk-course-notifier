@@ -13,13 +13,22 @@ class Course:
     def __repr__(self):
         return f"<Course {self.id} - {self.title}>"
 
-    def to_dict(self):
+    def to_dict(self) -> CourseData:
         return {
             "courseId": self.id,
             "sectionIds": self.section_ids,
             "title": self.title,
             "subjectCode": self.subject_code
         }
+
+    @classmethod
+    def from_dict(cls, data: CourseData) -> 'Course':
+        return cls({
+            "Id": data["courseId"],
+            "MatchingSectionIds": data["sectionIds"],
+            "Title": data["title"],
+            "SubjectCode": data.get("subjectCode")
+        })
 
     def get_sections_search_criteria(self) -> SectionsSearchCriteria:
         return {
