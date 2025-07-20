@@ -6,6 +6,9 @@ import requests
 import json
 from urllib.parse import urljoin
 
+from course import Course
+from custom_types import SectionsSearchCriteria
+
 BASE_URL = "https://fisk-ss.colleague.elluciancloud.com/Student/Courses/"
 
 
@@ -53,10 +56,20 @@ def fetch_courses(session, search_criteria):
     )
     throw_bad_response(response)
 
-    return response.json()["Courses"]
+    courses = response.json()["Courses"]
+
+    return [
+        Course(
+            courseId=course["Id"],
+            sectionIds=course["MatchingSectionIds"],
+            title=course["Title"],
+            subjectCode=course["SubjectCode"]
+        )
+        for course in courses
+    ]
 
 
-def fetch_sections(session, course_info):
+def fetch_sections(session: requests.Session, course_info: SectionsSearchCriteria):
     response = session.post(
         urljoin(BASE_URL, "Sections"),
         headers={
@@ -71,16 +84,11 @@ def fetch_sections(session, course_info):
 
 if __name__ == "__main__":
     session = requests.Session()
-
-    courses = fetch_courses(session, search_criteria={"terms": ["2025FA"], "keywordComponents": [
+    courses = fetch_courses(session, search_criteria={"terms": ["2025FA", "2025SU"], "keywordComponents": [
         {"subject": "CSCI", "courseNumber": "", "section": "", "synonym": ""},
         {"subject": "ART", "courseNumber": "", "section": "", "synonym": ""}
     ], })
 
-    course_info = [{"courseId": course["Id"], "sectionIds": [
-        course["MatchingSectionIds"]], "title": course['Title']} for course in courses]
-
-    sections = fetch_sections(session, course_info[0])
-    print(
-        f"Found {len(sections)} sections for course {course_info[0]['courseId']}:")
+    sections = fetch_sections(
+        session, courses[0].get_sections_search_criteria())
     pprint(sections)
