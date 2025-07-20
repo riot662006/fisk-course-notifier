@@ -1,4 +1,4 @@
-from custom_types import SeatAvailability
+from custom_types import SeatAvailability, SectionData
 
 
 class Section:
@@ -18,6 +18,35 @@ class Section:
         )
 
         self.instructor = data['FacultyDisplay']
+
+    def to_dict(self) -> SectionData:
+        return {
+            "id": self.id,
+            "name": self.name,
+            "courseId": self.course_id,
+            "instructor": self.instructor,
+            "availability": {
+                "available": self.availability.available,
+                "total": self.availability.total,
+                "waitlist": self.availability.waitlist
+            }
+        }
+
+    @classmethod
+    def from_dict(cls, data: SectionData) -> "Section":
+        # Reconstructs the original "Section" structure expected by __init__
+        return cls({
+            "Section": {
+                "Id": data["id"],
+                "SectionNameDisplay": data["name"],
+                "CourseId": data["courseId"],
+                "Available": data["availability"]["available"],
+                "Capacity": data["availability"]["total"],
+                "Waitlisted": data["availability"]["waitlist"],
+                "HasUnlimitedSeats": data["availability"]["total"] == float("inf")
+            },
+            "FacultyDisplay": data["instructor"]
+        })
 
     def __repr__(self):
         return f"<Section {self.id} - {self.name}>"
