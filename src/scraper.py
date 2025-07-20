@@ -57,17 +57,28 @@ def fetch_sections(session: requests.Session, search_criteria: SectionsSearchCri
         for section_data in term_and_section['Sections']
     ]
 
+def fetch_sections_by_course_labels(session: requests.Session, course_labels: list[str]):
+    courses = fetch_courses(session, search_criteria={
+        "keywordComponents": [{
+            "subject": course_label.split("-")[0],
+            "courseNumber": course_label.split("-")[1],
+            "section": "",
+            "synonym": ""
+        } for course_label in course_labels]
+    })
+
+    return [
+        section
+        for course in courses
+        for section in fetch_sections(session, course.get_sections_search_criteria())
+    ]
 
 if __name__ == "__main__":
     session = requests.Session()
-    courses = fetch_courses(session, search_criteria={"terms": ["2025FA", "2025SU"], "keywordComponents": [
-        {"subject": "CSCI", "courseNumber": "", "section": "", "synonym": ""},
-        {"subject": "ART", "courseNumber": "", "section": "", "synonym": ""}
-    ], })
-    print(f"Found {len(courses)} courses:")
-    pprint(courses)
-
-    sections = fetch_sections(
-        session, courses[0].get_sections_search_criteria())
-    print(f"\n{courses[0].title} sections:")
-    pprint(sections)
+    sections = fetch_sections_by_course_labels(session, ["ACC-230", "BAD-260"])
+    
+    if len(sections):
+        print("Found sections:")
+        pprint(sections)
+    else:
+        print("No sections found for the given course labels.")

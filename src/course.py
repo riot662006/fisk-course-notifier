@@ -39,3 +39,7 @@ class Course:
             "courseId": self.id,
             "sectionIds": self.section_ids
         }
+
+    def get_course_label(self) -> str:
+        return self.subject_code + "-" + self.subject_number
+    
