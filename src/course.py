@@ -8,6 +8,7 @@ class Course:
         self.id = data["Id"]
         self.section_ids = data["MatchingSectionIds"]
         self.title = data["Title"]
+        self.subject_number = data["Number"]
         self.subject_code = data["SubjectCode"]
 
     def __repr__(self):
@@ -18,6 +19,7 @@ class Course:
             "courseId": self.id,
             "sectionIds": self.section_ids,
             "title": self.title,
+            "subjectNumber": self.subject_number,
             "subjectCode": self.subject_code
         }
 
@@ -27,6 +29,7 @@ class Course:
             "Id": data["courseId"],
             "MatchingSectionIds": data["sectionIds"],
             "Title": data["title"],
+            "Number": data["subjectNumber"],
             "SubjectCode": data.get("subjectCode")
         })
 

@@ -14,7 +14,8 @@ class SeatAvailability(TypedDict):
 
 class CourseData(SectionsSearchCriteria):
     title: str
-    subjectCode: str | None
+    subjectCode: str
+    subjectNumber: str
 
 
 class SectionData(TypedDict):
