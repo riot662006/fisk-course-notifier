@@ -1,5 +1,6 @@
 from src.course import Course
 
+
 def test_course_to_dict():
     course = Course({
         "Id": 101,

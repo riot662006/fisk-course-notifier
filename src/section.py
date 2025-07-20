@@ -14,7 +14,7 @@ class Section:
         self.availability = SeatAvailability(
             availableSeats=int(section_data['Available']),
             totalSeats=int(section_data['Capacity']) if not (
-                section_data['HasUnlimitedSeats']) else 999_999_999,
+                section_data['HasUnlimitedSeats']) else None,
             waitlistSeats=int(section_data['Waitlisted'])
         )
 
@@ -44,7 +44,7 @@ class Section:
                 "Available": str(data["availability"]["availableSeats"]),
                 "Capacity": str(data["availability"]["totalSeats"]),
                 "Waitlisted": str(data["availability"]["waitlistSeats"]),
-                "HasUnlimitedSeats": data["availability"]["totalSeats"] == float("inf")
+                "HasUnlimitedSeats": data["availability"]["totalSeats"] == None
             },
             "FacultyDisplay": data["instructor"]
         })

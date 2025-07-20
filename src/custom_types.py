@@ -8,7 +8,7 @@ class SectionsSearchCriteria(TypedDict):
 
 class SeatAvailability(TypedDict):
     availableSeats: int
-    totalSeats: int
+    totalSeats: int | None
     waitlistSeats: int
 
 
