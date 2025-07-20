@@ -8,6 +8,7 @@ from urllib.parse import urljoin
 
 from course import Course
 from custom_types import SectionsSearchCriteria
+from section import Section
 
 BASE_URL = "https://fisk-ss.colleague.elluciancloud.com/Student/Courses/"
 
@@ -79,7 +80,15 @@ def fetch_sections(session: requests.Session, search_criteria: SectionsSearchCri
     )
     throw_bad_response(response)
 
-    return response.json()["SectionsRetrieved"]["TermsAndSections"]
+    term_and_sections = response.json(
+    )["SectionsRetrieved"]["TermsAndSections"]
+
+    return [
+        Section(section_data)
+
+        for term_and_section in term_and_sections
+        for section_data in term_and_section['Sections']
+    ]
 
 
 if __name__ == "__main__":
