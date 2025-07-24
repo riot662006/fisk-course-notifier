@@ -11,11 +11,6 @@ from .section import Section
 BASE_URL = "https://fisk-ss.colleague.elluciancloud.com/Student/Courses/"
 
 
-def throw_bad_response(response: requests.Response):
-    response.raise_for_status()  # Raises an HTTPError for bad responses (4xx or 5xx)
-    return response
-
-
 def fetch_courses(session: requests.Session, search_criteria: dict[str, Any]):
     response = session.post(
         urljoin(BASE_URL, "PostSearchCriteria"),
@@ -24,7 +19,7 @@ def fetch_courses(session: requests.Session, search_criteria: dict[str, Any]):
         },
         data=json.dumps(search_criteria)
     )
-    throw_bad_response(response)
+    response.raise_for_status()
 
     courses = response.json()["Courses"]
 
@@ -44,7 +39,7 @@ def fetch_sections(session: requests.Session, search_criteria: SectionsSearchCri
         },
         data=json.dumps(search_criteria)
     )
-    throw_bad_response(response)
+    response.raise_for_status()
 
     term_and_sections = response.json(
     )["SectionsRetrieved"]["TermsAndSections"]
