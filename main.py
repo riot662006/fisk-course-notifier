@@ -1,5 +1,6 @@
 import argparse
 from src.scraper_legacy import scrape_courses as watch_courses_legacy
+from src.scraper import watch_courses
 
 
 def main():
@@ -33,7 +34,7 @@ def main():
         watch_courses_legacy(course_codes)
     else:
         print("🚀 Running latest notifier...")
-        pass
+        watch_courses(course_codes)
 
 
 if __name__ == "__main__":
