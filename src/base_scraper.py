@@ -1,6 +1,8 @@
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 
+BASE_URL = "https://fisk-ss.colleague.elluciancloud.com/Student/Courses/"
+
 
 def create_driver(url: str, cookies: dict[str, str] = {}, headless: bool = False):
     # Initialize the Selenium WebDriver with necessary options
@@ -23,7 +25,8 @@ def create_driver(url: str, cookies: dict[str, str] = {}, headless: bool = False
 
     # Set the cookies from the `requests` response
     for cookie_name, cookie_value in cookies.items():
-        driver.add_cookie({'name': cookie_name, 'value': cookie_value}) # type: ignore
+        driver.add_cookie(  # type: ignore
+            {'name': cookie_name, 'value': cookie_value})
 
     # After setting the cookies, refresh the page in Selenium to apply them
     driver.refresh()

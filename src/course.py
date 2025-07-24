@@ -1,4 +1,11 @@
+import json
 from typing import Any
+from urllib.parse import urljoin
+
+import requests
+
+from .base_scraper import BASE_URL
+from .section import Section
 from .custom_types import CourseData, SectionsSearchCriteria
 
 
@@ -33,7 +40,7 @@ class Course:
             "Number": data["subjectNumber"],
             "SubjectCode": data.get("subjectCode")
         })
-    
+
     def get_course_search_criteria(self) -> dict[str, Any]:
         return {
             "subjectCode": self.subject_code,
@@ -48,4 +55,24 @@ class Course:
 
     def get_course_label(self) -> str:
         return self.subject_code + "-" + self.subject_number
-    
+
+    def fetch_sections(self, session: requests.Session) -> list[Section]:
+        response = session.post(
+            urljoin(BASE_URL, "Sections"),
+            headers={
+                'content-type': 'application/json, charset=UTF-8',
+            },
+            data=json.dumps(self.get_sections_search_criteria())
+        )
+
+        response.raise_for_status()
+
+        term_and_sections = response.json(
+        )["SectionsRetrieved"]["TermsAndSections"]
+
+        return [
+            Section(section_data)
+
+            for term_and_section in term_and_sections
+            for section_data in term_and_section['Sections']
+        ]

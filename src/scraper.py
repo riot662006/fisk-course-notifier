@@ -4,11 +4,10 @@ import requests
 import json
 from urllib.parse import urljoin
 
-from .course import Course
-from .custom_types import SectionsSearchCriteria
+from .base_scraper import BASE_URL
 from .section import Section
 
-BASE_URL = "https://fisk-ss.colleague.elluciancloud.com/Student/Courses/"
+from .course import Course
 
 
 def fetch_courses(session: requests.Session, search_criteria: dict[str, Any]):
@@ -31,27 +30,7 @@ def fetch_courses(session: requests.Session, search_criteria: dict[str, Any]):
     ]
 
 
-def fetch_sections(session: requests.Session, search_criteria: SectionsSearchCriteria):
-    response = session.post(
-        urljoin(BASE_URL, "Sections"),
-        headers={
-            'content-type': 'application/json, charset=UTF-8',
-        },
-        data=json.dumps(search_criteria)
-    )
-    response.raise_for_status()
-
-    term_and_sections = response.json(
-    )["SectionsRetrieved"]["TermsAndSections"]
-
-    return [
-        Section(section_data)
-
-        for term_and_section in term_and_sections
-        for section_data in term_and_section['Sections']
-    ]
-
-def fetch_sections_by_course_labels(session: requests.Session, course_labels: list[str]):
+def fetch_sections_by_course_labels(session: requests.Session, course_labels: list[str]) -> list[Section]:
     courses = fetch_courses(session, search_criteria={
         "keywordComponents": [{
             "subject": course_label.split("-")[0],
@@ -64,6 +43,5 @@ def fetch_sections_by_course_labels(session: requests.Session, course_labels: li
     return [
         section
         for course in courses
-        for section in fetch_sections(session, course.get_sections_search_criteria())
+        for section in course.fetch_sections(session)
     ]
-
