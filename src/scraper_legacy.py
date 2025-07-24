@@ -15,7 +15,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
 
-from pushbullet import Pushbullet # type: ignore
+from pushbullet import Pushbullet  # type: ignore
 
 # Configure Logging
 logging.basicConfig(filename="output/scraper.log", level=logging.INFO,
@@ -26,7 +26,6 @@ file_lock = threading.Lock()
 
 # Define some constants
 URL = "https://fisk-ss.colleague.elluciancloud.com/Student/Student/Courses/Search"
-COURSE_IDS = ["nsci-360", "csci-291"]
 
 # Load pushBullet api variables for messages
 load_dotenv()
@@ -46,16 +45,17 @@ def get_course_section_table(course_id: str):
         WebDriverWait(driver, 10).until(EC.presence_of_element_located(
             (By.ID, "collapsible-1-collapseBody")))
         courses_HTML = driver.find_element(
-            By.ID, "course-results").find_elements(By.CLASS_NAME, "esg-section--margin-top") # type: ignore
+            # type: ignore
+            By.ID, "course-results").find_elements(By.CLASS_NAME, "esg-section--margin-top")
 
         if not courses_HTML:
             logging.warning(f"No courses found for {course_id}")
             return None
 
         course_HTML = courses_HTML[0]
-        collapsible = course_HTML.find_element( # type: ignore
+        collapsible = course_HTML.find_element(  # type: ignore
             By.TAG_NAME, "collapsible-group")
-        collapsible_btn = collapsible.find_element( # type: ignore
+        collapsible_btn = collapsible.find_element(  # type: ignore
             By.CLASS_NAME, "esg-collapsible-group__toggle")
         collapsible_btn.click()
 
@@ -64,11 +64,11 @@ def get_course_section_table(course_id: str):
                 (By.XPATH, "//div[@data-bind='foreach: TermsAndSections']//div"))
         )
 
-        tables_HTML = collapsible.find_element(By.XPATH, "//div[@data-bind='foreach: TermsAndSections']").find_element( # type: ignore
+        tables_HTML = collapsible.find_element(By.XPATH, "//div[@data-bind='foreach: TermsAndSections']").find_element(  # type: ignore
             By.XPATH, "//h4[contains(text(), 'Fall 2025')]"
         ).find_element(By.XPATH, "./following-sibling::ul").find_elements(By.TAG_NAME, "table")
 
-        table_data = [[cell.text.strip() for cell in table.find_elements( # type: ignore
+        table_data = [[cell.text.strip() for cell in table.find_elements(  # type: ignore
             By.TAG_NAME, "tr")[1].find_elements(By.TAG_NAME, "td")] for table in tables_HTML]
 
         logging.info(
@@ -91,7 +91,7 @@ def generate_hash(data: dict[str, Any]) -> str:
     return hashlib.sha256(data_string.encode('utf-8')).hexdigest()
 
 
-def save_results_to_json(results: list[dict[str, list[list[str]]] | None], filename: str="output/course_data.json"):
+def save_results_to_json(results: list[dict[str, list[list[str]]] | None], filename: str = "output/course_data.json"):
     """Safely save scraped results to a JSON file."""
     with file_lock:
         should_update = False
@@ -105,8 +105,9 @@ def save_results_to_json(results: list[dict[str, list[list[str]]] | None], filen
         for result in results:
             if result:
                 for key, value in result.items():
-                    current_hash = generate_hash(data.get(key, [])) # type: ignore
-                    new_hash = generate_hash(value) # type: ignore
+                    current_hash = generate_hash(
+                        data.get(key, []))  # type: ignore
+                    new_hash = generate_hash(value)  # type: ignore
 
                     if current_hash != new_hash:
                         logging.info(f"New data found for {key}")
@@ -114,7 +115,7 @@ def save_results_to_json(results: list[dict[str, list[list[str]]] | None], filen
                         should_update = True
 
         if (should_update):
-            push = pb.push_note("COLLEAGUE SCRAPER", # type: ignore
+            push = pb.push_note("COLLEAGUE SCRAPER",  # type: ignore
                                 "New content!!! Check logs for details!!!")
             logging.info(f"Push sent: {push}")
             logging.info(f"Saving updated data to {filename}")
@@ -122,22 +123,23 @@ def save_results_to_json(results: list[dict[str, list[list[str]]] | None], filen
                 json.dump(data, file, indent=4)
 
 
-async def scrape_courses_async():
+async def scrape_courses_async(course_codes: list[str]):
     """Runs multiple scraping tasks asynchronously."""
     loop = asyncio.get_event_loop()
     with ThreadPoolExecutor(max_workers=3) as executor:
         tasks = [loop.run_in_executor(
-            executor, get_course_section_table, course_id) for course_id in COURSE_IDS]
+            executor, get_course_section_table, course_code) for course_code in course_codes]
         results = await asyncio.gather(*tasks)
         save_results_to_json(results)
 
 
-def scrape_courses():
+def scrape_courses(course_codes: list[str]):
     """Main function to scrape courses."""
 
     try:
         while True:
-            asyncio.run(scrape_courses_async())  # Run the scraping function
+            # Run the scraping function
+            asyncio.run(scrape_courses_async(course_codes))
             logging.info("Waiting 1 minute before next scrape...")
             time.sleep(60)  # Wait 60 seconds before the next run
     except KeyboardInterrupt:
