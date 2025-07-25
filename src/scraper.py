@@ -1,7 +1,8 @@
-import time
+from typing import Iterable
 
-import requests
 import json
+import requests
+import time
 from urllib.parse import urljoin
 
 from .base_scraper import BASE_URL
@@ -12,7 +13,7 @@ COURSE_DATA_FILE_PATH = "output/course_data.json"
 DEFAULT_POLL_INTERVAL = 60  # seconds
 
 
-def fetch_courses(session: requests.Session, course_codes: list[str]) -> list[Course]:
+def fetch_courses(session: requests.Session, course_codes: list[str]) -> dict[str, Course]:
     response = session.post(
         urljoin(BASE_URL, "PostSearchCriteria"),
         headers={
@@ -27,14 +28,12 @@ def fetch_courses(session: requests.Session, course_codes: list[str]) -> list[Co
     )
     response.raise_for_status()
 
-    courses = response.json()["Courses"]
+    courses = [Course(course) for course in response.json()["Courses"]]
 
-    return [
-        Course(
-            course
-        )
+    return {
+        course.get_course_label(): course
         for course in courses
-    ]
+    }
 
 
 def load_courses(path: str = COURSE_DATA_FILE_PATH) -> dict[str, CourseData]:
@@ -47,7 +46,7 @@ def load_courses(path: str = COURSE_DATA_FILE_PATH) -> dict[str, CourseData]:
         )
 
 
-def save_courses(courses: list[Course], path: str = COURSE_DATA_FILE_PATH):
+def save_courses(courses: Iterable[Course], path: str = COURSE_DATA_FILE_PATH):
     with open(path, 'w') as f:
         json.dump({course.get_course_label(): course.to_dict()
                   for course in courses}, f, indent=4)
@@ -63,7 +62,7 @@ def watch_courses(
 
     print("📡 Initial fetch...")
     previous_courses = fetch_courses(session, course_codes)
-    save_courses(previous_courses, courses_save_path)
+    save_courses(previous_courses.values(), courses_save_path)
 
     print(
         f"✅ Monitoring {len(previous_courses)} courses. Checking every {poll_interval} seconds.")
@@ -75,7 +74,7 @@ def watch_courses(
 
             if current_courses != previous_courses:
                 print("🔔 Change detected! Updating saved data.")
-                save_courses(current_courses, courses_save_path)
+                save_courses(current_courses.values(), courses_save_path)
                 # Optionally: send_notification(current_courses)
                 previous_courses = current_courses
             else:
