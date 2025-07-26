@@ -9,7 +9,7 @@ from .custom_types import CourseData
 from .diff import Diff
 
 COURSE_DATA_FILE_PATH = "output/course_data.json"
-DEFAULT_POLL_INTERVAL = 60  # seconds
+DEFAULT_POLL_INTERVAL = 10  # seconds
 
 
 def fetch_course_data(session: requests.Session, _course_codes: list[str]) -> dict[str, CourseData]:
@@ -99,7 +99,7 @@ def save_courses(courses: dict[str, Course], path: str):
 
 def notify_course_changes(diffs: Sequence[Diff]):
     body_lines = [
-        f"- {diff.get_message()}"
+        f"{diff.get_message()}"
         for diff in diffs
     ]
 

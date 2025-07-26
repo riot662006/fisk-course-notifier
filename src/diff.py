@@ -1,5 +1,7 @@
 from enum import Enum
 
+from .utils import style_arguments
+
 
 class DiffCode(Enum):
     NEW_SECTION = ("NEW_SECTION", False)
@@ -37,38 +39,41 @@ class Diff:
         return self.code.is_silent
 
     def get_message(self) -> str:
+        args = style_arguments(*self._args)
+
         match self._code:
             case DiffCode.NEW_SECTION:
-                course_code, section_codes, free_seats = self._args
-                return f"🆕 New section {section_codes} just popped up for {course_code}! {free_seats} avaliable seats. Don’t miss it!"
+                section_code, seats = args
+                return f"🆕  New {section_code}! {seats} seats!"
 
             case DiffCode.SEATS_BECAME_AVAILABLE:
-                section_code, free_seats = self._args
-                return f"✅ Section {section_code} has open seats now. {free_seats} left! Be quick!!!!"
+                section_code, seats = args
+                return f"✅  {section_code} has {seats} open! Jump in!"
 
             case DiffCode.SEATS_BECAME_UNAVAILABLE:
-                section_code = self._args
-                return f"❌ Section {section_code} is now full. Somebody beat you to it 😢"
+                section_code, = args
+                return f"❌  {section_code} is full! Too slow 😢"
 
             case DiffCode.SEATS_DROPPED:
-                section_code, seats = self._args
-                return f"⚠️ Only {seats} left in section {section_code}! Seats going fast!"
+                section_code, seats = args
+                return f"⚠️  {section_code} down to {seats} seats!"
 
             case DiffCode.SEATS_ROSE:
-                section_code, seats = self._args
-                return f"🔼 More seats just opened up in section {section_code} — back above {seats}. Suspicious no?"
+                section_code, seats = args
+                return f"🔼  {section_code} back up — {seats} seats now."
 
             case DiffCode.PROFESSOR_CHANGED:
-                section_code, old_prof, new_prof = self._args
-                return f"👨‍🏫 Section {section_code} has a new professor: {old_prof} → {new_prof}"
+                section_code, old, new = args
+                return f"👨‍🏫  {section_code}: Prof changed {old} → {new}"
 
             case DiffCode.FIRST_FETCH:
-                course_code, = self._args
-                return f"🆕 First time tracking course {course_code} — now watching."
+                course_code, = args
+                return f"👀  Now watching {course_code}."
 
             case DiffCode.SECTION_REMOVED:
-                course_code, section_code = self._args
-                return f"🚫 Section {section_code} in {course_code} has been removed. No longer tracking."
+                section_code, = args
+                return f"🚫  {section_code} removed."
 
             case _:
-                return f"❓ Unknown diff code: {self._code.value}"
+                return f"❓  Unknown diff: {self._code.value}"
+

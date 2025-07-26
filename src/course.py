@@ -23,7 +23,6 @@ class Course:
 
         diffs: list[Diff] = []
 
-        course_code = self._data['code']
         old_sections = self._data['sections']
         new_sections = data['sections']
 
@@ -40,7 +39,6 @@ class Course:
                 case None, _:
                     diffs.append(Diff(
                         DiffCode.NEW_SECTION,
-                        course_code,
                         new_section["code"],
                         new_section["free_seats"]
                     ))
@@ -48,7 +46,6 @@ class Course:
                 case _, None:
                     diffs.append(Diff(
                         DiffCode.SECTION_REMOVED,
-                        course_code,
                         old_section["code"]
                     ))
 
