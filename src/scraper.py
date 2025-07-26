@@ -1,31 +1,14 @@
-from typing import Any
-
 import json
 import requests
 import time
-from urllib.parse import urljoin
 
-
-from .base_scraper import BASE_URL
+from .base_scraper import fetch
 from .course import Course
 from .custom_types import CourseData
 from .diff import Diff
 
 COURSE_DATA_FILE_PATH = "output/course_data.json"
 DEFAULT_POLL_INTERVAL = 60  # seconds
-
-
-def fetch(session: requests.Session, path: str, data: dict[str, Any]) -> dict[str, Any]:
-    response = session.post(
-        urljoin(BASE_URL, path),
-        headers={
-            'content-type': 'application/json, charset=UTF-8',
-        },
-        data=json.dumps(data)
-    )
-
-    response.raise_for_status()
-    return response.json()
 
 
 def fetch_course_data(session: requests.Session, _course_codes: list[str]) -> dict[str, CourseData]:

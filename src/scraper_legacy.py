@@ -1,6 +1,4 @@
 from typing import Any
-from dotenv import load_dotenv
-import os
 
 import asyncio
 import logging
@@ -10,28 +8,14 @@ import time
 import threading
 from concurrent.futures import ThreadPoolExecutor
 
-from src.base_scraper import create_driver
+from src.base_scraper import create_driver, send_notification
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
 
-from pushbullet import Pushbullet  # type: ignore
-
-# Configure Logging
-logging.basicConfig(filename="output/scraper.log", level=logging.INFO,
-                    format="%(asctime)s - %(levelname)s - %(message)s")
 
 # Thread lock to prevent race conditions
 file_lock = threading.Lock()
-
-# Define some constants
-URL = "https://fisk-ss.colleague.elluciancloud.com/Student/Student/Courses/Search"
-
-# Load pushBullet api variables for messages
-load_dotenv()
-PUSH_BULLET_API_KEY = os.getenv("PUSH_BULLET_API_KEY")
-
-pb = Pushbullet(PUSH_BULLET_API_KEY)
 
 
 def get_course_section_table(course_id: str):
@@ -39,7 +23,7 @@ def get_course_section_table(course_id: str):
     logging.info(f"Starting scraping for course: {course_id}")
 
     # Ensure headless mode is used
-    driver = create_driver(f"{URL}?keyword={course_id}", headless=True)
+    driver = create_driver(f"Search?keyword={course_id}", headless=True)
 
     try:
         WebDriverWait(driver, 10).until(EC.presence_of_element_located(
@@ -115,8 +99,8 @@ def save_results_to_json(results: list[dict[str, list[list[str]]] | None], filen
                         should_update = True
 
         if (should_update):
-            push = pb.push_note("COLLEAGUE SCRAPER",  # type: ignore
-                                "New content!!! Check logs for details!!!")
+            push = send_notification("COLLEAGUE SCRAPER",  # type: ignore
+                                     "New content!!! Check logs for details!!!")
             logging.info(f"Push sent: {push}")
             logging.info(f"Saving updated data to {filename}")
             with open(filename, "w", encoding="utf-8") as file:
