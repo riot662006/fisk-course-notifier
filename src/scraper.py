@@ -99,7 +99,7 @@ def save_courses(courses: dict[str, Course], path: str):
 
 def notify_course_changes(diffs: Sequence[Diff]):
     body_lines = [
-        f"- {diff.get_message()}"
+        f"{diff.get_message()}"
         for diff in diffs
     ]
 
