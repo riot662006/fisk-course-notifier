@@ -1,8 +1,9 @@
 import json
+from typing import Sequence
 import requests
 import time
 
-from .base_scraper import fetch
+from .base_scraper import fetch, send_notification
 from .course import Course
 from .custom_types import CourseData
 from .diff import Diff
@@ -96,6 +97,19 @@ def save_courses(courses: dict[str, Course], path: str):
         json.dump(course_data, f, indent=4)
 
 
+def notify_course_changes(diffs: Sequence[Diff]):
+    body_lines = [
+        f"- {diff.get_message()}"
+        for diff in diffs
+    ]
+
+    if not body_lines:
+        return
+
+    body = "\n".join(body_lines)
+    send_notification("📢 Course Update Alert", body)
+
+
 def watch_courses(
     course_codes: list[str],
     *,
@@ -128,6 +142,8 @@ def watch_courses(
                     print("🔔 Changes detected!")
                     for diff in visible_diffs:
                         print(diff)
+
+                    notify_course_changes(visible_diffs)
                 else:
                     print("⏳ No significant changes detected — silent diffs only.")
 
