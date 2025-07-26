@@ -78,10 +78,14 @@ def load_courses(path: str) -> dict[str, Course]:
 
 
 def update_courses(data: dict[str, Course], changes: dict[str, CourseData]) -> list[Diff]:
+    for course_code in changes.keys():
+        if course_code not in data:
+            data[course_code] = Course(None)
+
     return [
         diff
         for course_code in changes.keys()
-        for diff in data.get(course_code, Course(None)).update_data(changes[course_code])
+        for diff in data[course_code].update_data(changes[course_code])
     ]
 
 
