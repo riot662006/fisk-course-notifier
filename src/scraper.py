@@ -142,7 +142,7 @@ def watch_courses(
                 save_courses(course_store, courses_save_path)
 
             else:
-                print("⏳ No changes detected.")
+                print("⏳ No significant changes detected — all clear for now.")
 
         except Exception as e:
             print(f"⚠️ Error during fetch: {e}")
