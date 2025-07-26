@@ -1,78 +1,30 @@
-import json
-from typing import Any
-from urllib.parse import urljoin
+from typing import Optional
 
-import requests
-
-from .base_scraper import BASE_URL
-from .section import Section
-from .custom_types import CourseData, SectionsSearchCriteria
+from .custom_types import CourseData
+from .diff import Diff, DiffCode
 
 
 class Course:
-    '''Represents a course with its details and methods to interact with course data. Feel free to add data as needed.'''
+    def __init__(self, data: Optional[CourseData]):
+        self._data: Optional[CourseData] = data
 
-    def __init__(self, data: dict[str, Any]):
-        self.id = data["Id"]
-        self.section_ids = data["MatchingSectionIds"]
-        self.title = data["Title"]
-        self.subject_number = data["Number"]
-        self.subject_code = data["SubjectCode"]
+    def get_data(self) -> Optional[CourseData]:
+        return self._data
 
-    def __repr__(self):
-        return f"<Course {self.id} - {self.title}>"
+    def update_data(self, data: Optional[CourseData]) -> list[Diff]:
+        if not data:
+            return []
 
-    def to_dict(self) -> CourseData:
-        return {
-            "courseId": self.id,
-            "sectionIds": self.section_ids,
-            "title": self.title,
-            "subjectNumber": self.subject_number,
-            "subjectCode": self.subject_code
-        }
+        if not self._data:
+            self._data = data
+            return []
 
-    @classmethod
-    def from_dict(cls, data: CourseData) -> 'Course':
-        return cls({
-            "Id": data["courseId"],
-            "MatchingSectionIds": data["sectionIds"],
-            "Title": data["title"],
-            "Number": data["subjectNumber"],
-            "SubjectCode": data.get("subjectCode")
-        })
+        diffs: list[Diff] = []
 
-    def get_course_search_criteria(self) -> dict[str, Any]:
-        return {
-            "subjectCode": self.subject_code,
-            "courseNumber": self.subject_number,
-        }
-
-    def get_sections_search_criteria(self) -> SectionsSearchCriteria:
-        return {
-            "courseId": self.id,
-            "sectionIds": self.section_ids
-        }
-
-    def get_course_label(self) -> str:
-        return self.subject_code + "-" + self.subject_number
-
-    def fetch_sections(self, session: requests.Session) -> list[Section]:
-        response = session.post(
-            urljoin(BASE_URL, "Sections"),
-            headers={
-                'content-type': 'application/json, charset=UTF-8',
-            },
-            data=json.dumps(self.get_sections_search_criteria())
-        )
-
-        response.raise_for_status()
-
-        term_and_sections = response.json(
-        )["SectionsRetrieved"]["TermsAndSections"]
-
-        return [
-            Section(section_data)
-
-            for term_and_section in term_and_sections
-            for section_data in term_and_section['Sections']
-        ]
+        new_sections = data['sections'].keys() - self._data['sections'].keys()
+        if len(new_sections):
+            diffs.append(Diff(DiffCode.NEW_SECTION, data['code'], *[
+                         data['sections'][section_id]['code'] for section_id in new_sections]))
+                
+        self._data = data
+        return diffs

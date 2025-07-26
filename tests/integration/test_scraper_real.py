@@ -1,13 +1,8 @@
 import pytest
-from src.base_scraper import BASE_URL
 
-import requests
-
-session = requests.Session()
+from src.scraper import watch_courses
 
 
 @pytest.mark.integration
 def test_scraper_request():
-    response = session.get(BASE_URL)
-
-    assert response.status_code == 200
+    watch_courses(["NSCI-290"])

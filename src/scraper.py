@@ -1,55 +1,112 @@
-from typing import Iterable
+from typing import Any
 
 import json
 import requests
 import time
 from urllib.parse import urljoin
 
+
 from .base_scraper import BASE_URL
 from .course import Course
 from .custom_types import CourseData
+from .diff import Diff
 
 COURSE_DATA_FILE_PATH = "output/course_data.json"
-DEFAULT_POLL_INTERVAL = 60  # seconds
+DEFAULT_POLL_INTERVAL = 10  # seconds
 
 
-def fetch_courses(session: requests.Session, course_codes: list[str]) -> dict[str, Course]:
+def fetch(session: requests.Session, path: str, data: dict[str, Any]) -> dict[str, Any]:
     response = session.post(
-        urljoin(BASE_URL, "PostSearchCriteria"),
+        urljoin(BASE_URL, path),
         headers={
             'content-type': 'application/json, charset=UTF-8',
         },
-        data=json.dumps({
-            "keywordComponents": [{
-                "subject": course_code.split("-")[0],
-                "courseNumber": course_code.split("-")[1],
-            } for course_code in course_codes]
-        })
+        data=json.dumps(data)
     )
+
     response.raise_for_status()
+    return response.json()
 
-    courses = [Course(course) for course in response.json()["Courses"]]
 
-    return {
-        course.get_course_label(): course
-        for course in courses
+def fetch_course_data(session: requests.Session, _course_codes: list[str]) -> dict[str, CourseData]:
+    course_codes = set(_course_codes)
+
+    search_criteria = {
+        "keywordComponents": [{
+            "subject": course_code.split("-")[0],
+            "courseNumber": course_code.split("-")[1],
+        } for course_code in course_codes]
     }
 
+    courses = fetch(session, "PostSearchCriteria", search_criteria)["Courses"]
+    course_data: dict[str, CourseData] = {}
 
-def load_courses(path: str = COURSE_DATA_FILE_PATH) -> dict[str, CourseData]:
+    for course in courses:
+        course_code: str = course['SubjectCode'] + "-" + course['Number']
+
+        if course_code in course_codes:
+            course_id = course["Id"]
+            section_ids: list[str] = course["MatchingSectionIds"]
+
+            course_data[course_code] = {
+                "id": course_id,
+                "code": course_code,
+                "sections": {},
+                "fetch_timestamp": int(time.time())
+            }
+
+            terms_and_sections = fetch(session, "Sections", {
+                "courseId": course_id, "sectionIds": section_ids})["SectionsRetrieved"]["TermsAndSections"]
+            sections = [
+                section
+                for term_and_sections in terms_and_sections
+                for section in term_and_sections["Sections"]
+            ]
+
+            for section in sections:
+                section_id: str = section["Section"]["Id"]
+                section_code: str = section["Section"]["SectionNameDisplay"]
+                section_professor = section["FacultyDisplay"]
+                free_seats = section["Section"]["Available"]
+
+                course_data[course_code]["sections"][section_id] = {
+                    "code": section_code,
+                    "professor": section_professor,
+                    "free_seats": free_seats
+                }
+
+    missing = course_codes - set(course_data.keys())
+    if missing:
+        raise ValueError(
+            f"Missing course data for: {', '.join(sorted(missing))}")
+
+    return course_data
+
+
+def load_courses(path: str = COURSE_DATA_FILE_PATH) -> dict[str, Course]:
     try:
         with open(path, 'r') as f:
-            return json.load(f)
+            all_data: dict[str, CourseData] = json.load(f)
+            return {code: Course(data) for code, data in all_data.items()}
     except (json.JSONDecodeError):
         raise ValueError(
             f"Could not load courses from {path}. File may be missing or corrupted."
         )
 
 
-def save_courses(courses: Iterable[Course], path: str = COURSE_DATA_FILE_PATH):
+def update_courses(data: dict[str, Course], changes: dict[str, CourseData]) -> list[Diff]:
+    return [
+        diff
+        for course_code in changes.keys()
+        for diff in data.get(course_code, Course(None)).update_data(changes[course_code])
+    ]
+
+
+def save_courses(courses: dict[str, Course], path: str = COURSE_DATA_FILE_PATH):
     with open(path, 'w') as f:
-        json.dump({course.get_course_label(): course.to_dict()
-                  for course in courses}, f, indent=4)
+        course_data = {code: course.get_data()
+                       for code, course in courses.items()}
+        json.dump(course_data, f, indent=4)
 
 
 def watch_courses(
@@ -61,23 +118,31 @@ def watch_courses(
     session = requests.Session()
 
     print("📡 Initial fetch...")
-    previous_courses = fetch_courses(session, course_codes)
-    save_courses(previous_courses.values(), courses_save_path)
+    course_data = fetch_course_data(session, course_codes)
+
+    course_store = {code: Course(data) for code, data in course_data.items()}
+    save_courses(course_store)
 
     print(
-        f"✅ Monitoring {len(previous_courses)} courses. Checking every {poll_interval} seconds.")
+        f"✅ Monitoring {len(course_store)} courses. Checking every {poll_interval} seconds.")
 
     while True:
         time.sleep(poll_interval)
         try:
-            current_courses = fetch_courses(session, course_codes)
+            course_store = load_courses()
 
-            if current_courses != previous_courses:
-                print("🔔 Change detected! Updating saved data.")
-                save_courses(current_courses.values(), courses_save_path)
-                # Optionally: send_notification(current_courses)
-                previous_courses = current_courses
+            updates = fetch_course_data(session, course_codes)
+            diffs = update_courses(course_store, updates)
+
+            if diffs:
+                print("🔔 Changes detected!")
+                for diff in diffs:
+                    print(diff)
+                print("Updating store.")
+                save_courses(course_store)
+
             else:
                 print("⏳ No changes detected.")
+
         except Exception as e:
             print(f"⚠️ Error during fetch: {e}")

@@ -1,26 +1,13 @@
 from typing import TypedDict
 
-
-class SectionsSearchCriteria(TypedDict):
-    courseId: int
-    sectionIds: list[str]
-
-
-class SeatAvailability(TypedDict):
-    availableSeats: int
-    totalSeats: int | None
-    waitlistSeats: int
-
-
-class CourseData(SectionsSearchCriteria):
-    title: str
-    subjectCode: str
-    subjectNumber: str
-
-
 class SectionData(TypedDict):
-    sectionId: str
-    name: str
-    courseId: str
-    instructor: str
-    availability: SeatAvailability
+    code: str
+    professor: str
+    free_seats: int
+
+class CourseData(TypedDict):
+    id: str
+    code: str
+    sections: dict[str, SectionData]
+    fetch_timestamp: int
+
