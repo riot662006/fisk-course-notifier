@@ -135,14 +135,20 @@ def watch_courses(
             diffs = update_courses(course_store, updates)
 
             if diffs:
-                print("🔔 Changes detected!")
-                for diff in diffs:
-                    print(diff)
-                print("Updating store.")
+                visible_diffs = [d for d in diffs if not d.is_silent()]
+
+                if visible_diffs:
+                    print("🔔 Changes detected!")
+                    for diff in visible_diffs:
+                        print(diff)
+                else:
+                    print("⏳ No significant changes detected — silent diffs only.")
+
+                print("💾 Updating store")
                 save_courses(course_store, courses_save_path)
 
             else:
-                print("⏳ No significant changes detected — all clear for now.")
+                print("⏳ No changes detected.")
 
         except Exception as e:
             print(f"⚠️ Error during fetch: {e}")

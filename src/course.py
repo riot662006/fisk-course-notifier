@@ -17,7 +17,9 @@ class Course:
 
         if not self._data:
             self._data = data
-            return []
+            return [
+                Diff(DiffCode.FIRST_FETCH, data["code"])
+            ]
 
         diffs: list[Diff] = []
 
@@ -44,7 +46,11 @@ class Course:
                     ))
 
                 case _, None:
-                    pass
+                    diffs.append(Diff(
+                        DiffCode.SECTION_REMOVED,
+                        course_code,
+                        old_section["code"]
+                    ))
 
                 case _, _:
                     section_code = new_section['code']
@@ -95,6 +101,6 @@ class Course:
                             old_section["professor"],
                             new_section["professor"]
                         ))
-                        
+
         self._data = data
         return diffs
