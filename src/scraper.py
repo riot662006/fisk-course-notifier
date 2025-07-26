@@ -83,7 +83,7 @@ def fetch_course_data(session: requests.Session, _course_codes: list[str]) -> di
     return course_data
 
 
-def load_courses(path: str = COURSE_DATA_FILE_PATH) -> dict[str, Course]:
+def load_courses(path: str) -> dict[str, Course]:
     try:
         with open(path, 'r') as f:
             all_data: dict[str, CourseData] = json.load(f)
@@ -102,7 +102,7 @@ def update_courses(data: dict[str, Course], changes: dict[str, CourseData]) -> l
     ]
 
 
-def save_courses(courses: dict[str, Course], path: str = COURSE_DATA_FILE_PATH):
+def save_courses(courses: dict[str, Course], path: str):
     with open(path, 'w') as f:
         course_data = {code: course.get_data()
                        for code, course in courses.items()}
@@ -121,7 +121,7 @@ def watch_courses(
     course_data = fetch_course_data(session, course_codes)
 
     course_store = {code: Course(data) for code, data in course_data.items()}
-    save_courses(course_store)
+    save_courses(course_store, courses_save_path)
 
     print(
         f"✅ Monitoring {len(course_store)} courses. Checking every {poll_interval} seconds.")
@@ -129,7 +129,7 @@ def watch_courses(
     while True:
         time.sleep(poll_interval)
         try:
-            course_store = load_courses()
+            course_store = load_courses(courses_save_path)
 
             updates = fetch_course_data(session, course_codes)
             diffs = update_courses(course_store, updates)
@@ -139,7 +139,7 @@ def watch_courses(
                 for diff in diffs:
                     print(diff)
                 print("Updating store.")
-                save_courses(course_store)
+                save_courses(course_store, courses_save_path)
 
             else:
                 print("⏳ No changes detected.")
