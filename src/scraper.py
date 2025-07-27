@@ -3,6 +3,8 @@ from typing import Sequence
 import requests
 import time
 
+from .utils import log, print_and_log
+
 from .base_scraper import fetch, send_notification
 from .course import Course
 from .custom_types import CourseData
@@ -124,7 +126,7 @@ def watch_courses(
     course_store = {code: Course(data) for code, data in course_data.items()}
     save_courses(course_store, courses_save_path)
 
-    print(
+    print_and_log(
         f"✅ Monitoring {len(course_store)} courses. Checking every {poll_interval} seconds.")
 
     while True:
@@ -136,22 +138,24 @@ def watch_courses(
             diffs = update_courses(course_store, updates)
 
             if diffs:
+                for diff in diffs:
+                    log(diff.get_message())
+
                 visible_diffs = [d for d in diffs if not d.is_silent()]
 
                 if visible_diffs:
-                    print("🔔 Changes detected!")
-                    for diff in visible_diffs:
-                        print(diff)
-
+                    print(
+                        "🔔 Changes detected! See logs at 'logs/course_watcher.log' for details.")
                     notify_course_changes(visible_diffs)
                 else:
-                    print("⏳ No significant changes detected — silent diffs only.")
+                    print(
+                        "⏳ No significant changes — silent diffs only. See logs at 'logs/course_watcher.log' for details.")
 
-                print("💾 Updating store")
+                print_and_log("💾 Updating store")
                 save_courses(course_store, courses_save_path)
 
             else:
-                print("⏳ No changes detected.")
+                print_and_log("⏳ No changes detected.")
 
         except Exception as e:
-            print(f"⚠️ Error during fetch: {e}")
+            print_and_log(f"⚠️ Error during fetch: {e}")
