@@ -1,6 +1,7 @@
 # src/utils/logging.py
 
 import logging
+from logging.handlers import RotatingFileHandler
 
 def _is_ascii_printable(ch: str) -> bool:
     return 32 <= ord(ch) <= 126
@@ -44,4 +45,42 @@ def print_and_log(message: str) -> None:
     print(message)
     log(message)
 
-__all__ = ["normalize_styled_value", "log", "print_and_log"]
+def setup_logging(
+    *,
+    level: int = logging.INFO,
+    logfile: str | None = "output/scraper.log",
+    to_console: bool = True,
+    rotating: bool = True,
+    max_bytes: int = 1_000_000,
+    backup_count: int = 3,
+    fmt: str = "%(asctime)s [%(levelname)s] %(message)s",
+    datefmt: str = "%H:%M:%S",
+) -> None:
+    """
+    Call once at startup. Creates console/file handlers as requested.
+    """
+    logger = logging.getLogger()
+    logger.setLevel(level)
+
+    # avoid duplicate handlers if called twice
+    if logger.handlers:
+        return
+
+    formatter = logging.Formatter(fmt=fmt, datefmt=datefmt)
+
+    if logfile:
+        if rotating:
+            fh = RotatingFileHandler(logfile, maxBytes=max_bytes, backupCount=backup_count, encoding="utf-8")
+        else:
+            fh = logging.FileHandler(logfile, encoding="utf-8")
+        fh.setLevel(level)
+        fh.setFormatter(formatter)
+        logger.addHandler(fh)
+
+    if to_console:
+        ch = logging.StreamHandler()
+        ch.setLevel(level)
+        ch.setFormatter(formatter)
+        logger.addHandler(ch)
+
+__all__ = ["normalize_styled_value", "log", "print_and_log", "setup_logging"]

@@ -5,6 +5,7 @@ import sys
 
 from . import watch_courses, watch_courses_legacy
 
+
 def parse_args(argv: list[str]) -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         prog="fisk-course-notifier",
@@ -28,12 +29,14 @@ def parse_args(argv: list[str]) -> argparse.Namespace:
     )
     return parser.parse_args(argv)
 
+
 def main(argv: list[str] | None = None) -> int:
     args = parse_args(sys.argv[1:] if argv is None else argv)
 
     if not args.course_codes:
         print("⚠️ No course codes provided.")
-        print("Usage: python -m src [--legacy] [--interval SECONDS] COURSE_CODE ...")
+        print(
+            "Usage: python -m src [--legacy] [--interval SECONDS] COURSE_CODE ...")
         return 2  # typical 'bad usage' exit code
 
     course_codes = [code.upper() for code in args.course_codes]
@@ -46,6 +49,7 @@ def main(argv: list[str] | None = None) -> int:
         watch_courses(course_codes, poll_interval=args.interval)
 
     return 0
+
 
 if __name__ == "__main__":
     raise SystemExit(main())

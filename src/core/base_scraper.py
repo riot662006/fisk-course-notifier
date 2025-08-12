@@ -8,15 +8,10 @@ from selenium.webdriver.chrome.options import Options
 from urllib.parse import urljoin
 
 import json
-import logging
 import os
 import requests
 
 BASE_URL = "https://fisk-ss.colleague.elluciancloud.com/Student/Courses/"
-
-# Configure Logging
-logging.basicConfig(filename="output/scraper.log", level=logging.INFO,
-                    format="%(asctime)s - %(levelname)s - %(message)s")
 
 # Load pushBullet api variables for messages
 load_dotenv()

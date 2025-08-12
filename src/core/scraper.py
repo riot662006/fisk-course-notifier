@@ -5,10 +5,10 @@ from typing import Sequence
 import requests
 import time
 
-from .base_scraper import fetch, send_notification
-
 from src.models import Course, CourseData, Diff
-from src.utils import log, print_and_log
+from src.utils import log, print_and_log, setup_logging
+
+from .base_scraper import fetch, send_notification
 
 COURSE_DATA_FILE_PATH = "output/course_data.json"
 DEFAULT_POLL_INTERVAL = 10  # seconds
@@ -118,6 +118,9 @@ def watch_courses(
     courses_save_path: str = COURSE_DATA_FILE_PATH,
     poll_interval: int = DEFAULT_POLL_INTERVAL,
 ):
+    # Setup logging
+    setup_logging(logfile="output/scraper.log")
+
     session = requests.Session()
 
     print("📡 Initial fetch...")

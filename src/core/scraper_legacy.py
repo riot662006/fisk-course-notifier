@@ -14,6 +14,8 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
 
+from src.utils import setup_logging
+
 from .base_scraper import create_driver, send_notification
 
 # Thread lock to prevent race conditions
@@ -121,6 +123,8 @@ async def scrape_courses_async(course_codes: list[str]):
 
 def scrape_courses(course_codes: list[str]):
     """Main function to scrape courses."""
+    # Setup logging
+    setup_logging(logfile="output/scraper.log")
 
     try:
         while True:
