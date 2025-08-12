@@ -4,3 +4,4 @@ bs4
 selenium
 pushbullet.py
 python-dotenv
+pytest
