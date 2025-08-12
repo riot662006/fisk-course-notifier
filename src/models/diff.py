@@ -1,6 +1,8 @@
+# src/models/diff.py
+
 from enum import Enum
 
-from .utils import style_arguments
+from src.utils import style_arguments
 
 
 class DiffCode(Enum):

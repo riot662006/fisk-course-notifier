@@ -1,6 +1,8 @@
+# src/models/course.py
+
 from typing import Optional
 
-from .custom_types import CourseData
+from .types import CourseData
 from .diff import Diff, DiffCode
 
 

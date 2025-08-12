@@ -1,3 +1,5 @@
+# src/core/scraper_legacy.py
+
 from typing import Any
 
 import asyncio
@@ -8,11 +10,11 @@ import time
 import threading
 from concurrent.futures import ThreadPoolExecutor
 
-from src.base_scraper import create_driver, send_notification
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
 
+from .base_scraper import create_driver, send_notification
 
 # Thread lock to prevent race conditions
 file_lock = threading.Lock()

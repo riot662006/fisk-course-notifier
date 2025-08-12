@@ -1,3 +1,5 @@
+# src/core/base_scraper.py
+
 from dotenv import load_dotenv
 from pushbullet import Pushbullet  # type: ignore
 from typing import Any

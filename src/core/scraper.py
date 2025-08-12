@@ -1,14 +1,14 @@
+# src/core/scraper.py
+
 import json
 from typing import Sequence
 import requests
 import time
 
-from .utils import log, print_and_log
-
 from .base_scraper import fetch, send_notification
-from .course import Course
-from .custom_types import CourseData
-from .diff import Diff
+
+from src.models import Course, CourseData, Diff
+from src.utils import log, print_and_log
 
 COURSE_DATA_FILE_PATH = "output/course_data.json"
 DEFAULT_POLL_INTERVAL = 10  # seconds

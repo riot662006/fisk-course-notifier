@@ -1,7 +1,5 @@
 from typing import Optional
-from src.custom_types import CourseData, SectionData
-from src.course import Course
-from src.diff import Diff, DiffCode
+from src.models import CourseData, SectionData, Course, Diff, DiffCode
 
 
 def course_data_factory(code: str = "CSCI-101", id: str = "123", sections: Optional[dict[str, SectionData]] = None) -> CourseData:

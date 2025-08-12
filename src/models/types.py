@@ -1,3 +1,5 @@
+# src/models/types.py
+
 from typing import TypedDict
 
 class SectionData(TypedDict):

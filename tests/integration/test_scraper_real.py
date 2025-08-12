@@ -1,6 +1,6 @@
 import pytest
 
-from src.scraper import watch_courses
+from src import watch_courses
 
 
 @pytest.mark.integration
