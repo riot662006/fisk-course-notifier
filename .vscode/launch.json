@@ -7,7 +7,7 @@
       "request": "launch",
       "program": "${workspaceFolder}/main.py",
       "console": "integratedTerminal",
-      "args": ["NSCI-290"] // i know this works
+      "args": ["CORE-260", "CSCI-291", "NSCI-360", "-i 900"] // i know this works
     }
   ]
 }
