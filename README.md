@@ -19,11 +19,11 @@
 
 ## 📁 Project Structure
 
-- [`main.py`](main.py): Starting point
-- [`src/scraper.py`](src/scraper.py): Main watcher loop, API fetch, diffing, and notification logic.
-- [`src/course.py`](src/course.py): Course and section data model, change tracking.
-- [`src/diff.py`](src/diff.py): Change types and pretty message formatting.
-- [`src/utils.py`](src/utils.py): Logging, stylized output, and helpers.
+- [`main.py`](main.py): Entry point
+- [`src/core/*`](src/core): Main watcher loop, API fetch, diffing, and notification logic.
+- [`src/models/*`](src/course): Typing, Course and section data model, diff and diffCodes.
+- [`src/utils/*`](src/utils): Logging, stylized output, and helpers.
+- [`tests/*`](tests/): Unit and integration tests
 
 Generated files:
 
